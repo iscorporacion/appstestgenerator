@@ -22,9 +22,15 @@ app.use('/auth', authRouter);
 app.use('/private', profileRouter);
 app.use("/app", appsRouter)
 
-https.createServer({
-    key: fs.readFileSync(path.join(__dirname, '../', 'subject_iscorporacion.key')),
-    cert: fs.readFileSync(path.join(__dirname, '../', 'subject_iscorporacion.crt'))
-}, app).listen(port, () => {
-    console.log(`La aplicación está escuchando en https://localhost:${port}`);
-});
+if (process.env.NODE_ENV === 'development') {
+    https.createServer({
+        key: fs.readFileSync(path.join(__dirname, '../', 'subject_iscorporacion.key')),
+        cert: fs.readFileSync(path.join(__dirname, '../', 'subject_iscorporacion.crt'))
+    }, app).listen(port, () => {
+        console.log(`La aplicación está escuchando en https://localhost:${port}`);
+    });
+} else {
+    app.listen(port, () => {
+        console.log(`La aplicación está escuchando en http://localhost:${port}`);
+    });
+}
