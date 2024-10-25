@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
+dotenv.config();
 // Reemplaza esto con tu URI de conexión desde MongoDB Atlas
 const MONGO_URI = process.env.MONGO_URI || '';
 
