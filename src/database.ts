@@ -1,10 +1,13 @@
 import mongoose from 'mongoose';
 
 // Reemplaza esto con tu URI de conexión desde MongoDB Atlas
-const MONGO_URI = 'mongodb+srv://apptestgenerator:Bvs2TTmIiIDhnlce@apptestgenerator.jr6fs.mongodb.net/apptestgenerator?retryWrites=true&w=majority&appName=AppTestGenerator';
+const MONGO_URI = process.env.MONGO_URI || '';
 
 export const connectDB = async () => {
     try {
+        if (!MONGO_URI) {
+            throw new Error('La URI de conexión a la base de datos no está definida');
+        }
         await mongoose.connect(MONGO_URI, {
         });
         console.log('Conectado a la base de datos MongoDB Atlas');
