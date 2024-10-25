@@ -9,7 +9,8 @@
         "plugin:@typescript-eslint/recommended"
     ],
     "ignorePatterns": [
-        "dist/**/*"
+        "dist/**/*",
+        "ecosystem.config.js"
     ],
     "overrides": [],
     "parser": "@typescript-eslint/parser",
