@@ -1,0 +1,1 @@
+## Setup basic project typescript
