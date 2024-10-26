@@ -6,6 +6,7 @@ import { authenticateJWT } from '../middlewares/authMiddleware';
 
 import { Application } from '../models/Application';
 import { Module } from '../models/Module';
+import { UseCase } from '../models/UseCase';
 
 //ruta para registro y autentificacion sufijo /apps
 // Crear una nueva aplicación para el usuario autenticado
@@ -27,6 +28,30 @@ router.post('/', authenticateJWT, async (req: Request, res: Response) => {
         res.status(201).json({ message: 'Aplicación creada', savedApplication });
     } catch (error) {
         res.status(500).json({ error: 'Error al crear la aplicación' });
+    }
+});
+
+//actualizar una aplicacion
+router.put('/:appId', authenticateJWT, async (req: Request, res: Response) => {
+    const { appId } = req.params;
+    const { name, description } = req.body;
+
+    if (!name || !description) {
+        return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    }
+
+    try {
+        // Verifica que la aplicación pertenezca al usuario
+        const application = await Application.findOne({ _id: appId, user: req.user.id });
+        if (!application) return res.status(404).json({ error: 'Aplicación no encontrada o no autorizada' });
+
+        application.name = name;
+        application.description = description;
+        await application.save();
+
+        res.json({ message: 'Aplicación actualizada', application });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la aplicación' });
     }
 });
 
@@ -208,6 +233,110 @@ router.patch('/:appId/modules/:moduleId', authenticateJWT, async (req: Request, 
         res.json({ message: 'Estado del módulo actualizado', module });
     } catch (error) {
         res.status(500).json({ error: 'Error al actualizar el estado del módulo' });
+    }
+});
+
+//actualizar una aplicacion
+router.put('/:appId', authenticateJWT, async (req: Request, res: Response) => {
+    const { appId } = req.params;
+    const { name, description } = req.body;
+
+    if (!name || !description) {
+        return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    }
+
+    try {
+        // Verifica que la aplicación pertenezca al usuario
+        const application = await Application.findOne({ _id: appId, user: req.user.id });
+        if (!application) return res.status(404).json({ error: 'Aplicación no encontrada o no autorizada' });
+
+        application.name = name;
+        application.description = description;
+        await application.save();
+
+        res.json({ message: 'Aplicación actualizada', application });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la aplicación' });
+    }
+});
+
+// Crear un nuevo caso de prueba para un módulo específico
+router.post('/:appId/modules/:moduleId/usecases', authenticateJWT, async (req: Request, res: Response) => {
+    try {
+        const { moduleId } = req.params;
+        const { title, testCases } = req.body;
+
+        // Verificar que el módulo exista
+        const moduleExists = await Module.findById(moduleId);
+        if (!moduleExists) return res.status(404).json({ message: 'Módulo no encontrado' });
+
+        // Crear el caso de uso
+        const useCase = new UseCase({ title, module: moduleId, testCases });
+        await useCase.save();
+
+        res.status(201).json(useCase);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al crear el caso de uso', error });
+    }
+});
+
+// Obtener todos los casos de uso de un módulo
+router.get('/:appId/modules/:moduleId/usecases', async (req: Request, res: Response) => {
+    try {
+        const { moduleId } = req.params;
+        const useCases = await UseCase.find({ module: moduleId });
+
+        res.status(200).json(useCases);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener casos de uso', error });
+    }
+});
+
+// Obtener un caso de uso específico
+router.get('/:appId/modules/:moduleId/usecases/:useCaseId', async (req: Request, res: Response) => {
+    try {
+        const { useCaseId } = req.params;
+        const useCase = await UseCase.findById(useCaseId);
+
+        if (!useCase) return res.status(404).json({ message: 'Caso de uso no encontrado' });
+
+        res.status(200).json(useCase);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener el caso de uso', error });
+    }
+});
+
+// Actualizar un caso de uso
+router.put('/:appId/modules/:moduleId/usecases/:useCaseId', async (req: Request, res: Response) => {
+    try {
+        const { useCaseId } = req.params;
+        const { title, testCases } = req.body;
+
+        const useCase = await UseCase.findByIdAndUpdate(
+            useCaseId,
+            { title, testCases },
+            { new: true }
+        );
+
+        if (!useCase) return res.status(404).json({ message: 'Caso de uso no encontrado' });
+
+        res.status(200).json(useCase);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar el caso de uso', error });
+    }
+});
+
+// Eliminar un caso de uso
+router.delete('/:appId/modules/:moduleId/usecases/:useCaseId', async (req: Request, res: Response) => {
+    try {
+        const { useCaseId } = req.params;
+        const useCase = await UseCase.findByIdAndDelete(useCaseId);
+
+        if (!useCase) return res.status(404).json({ message: 'Caso de uso no encontrado' });
+
+        res.status(200).json({ message: 'Caso de uso eliminado' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al eliminar el caso de uso', error });
     }
 });
 

@@ -1,0 +1,723 @@
+openapi: 3.1.0
+info:
+  title: API de AppTestGenerator
+  description: API para gestionar aplicaciones y módulos en AppTestGenerator.
+  version: 1.2.0
+servers:
+  - url: https://apptestgenerator.iscorporacion.net
+    description: Servidor principal de AppTestGenerator
+paths:
+  /app:
+    get:
+      operationId: listarApps
+      summary: Lista todas las aplicaciones
+      description: Endpoint para obtener una lista completa de aplicaciones.
+      responses:
+        "200":
+          description: Lista de aplicaciones obtenida con éxito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Nombre de la aplicación
+                    description:
+                      type: string
+                      description: Descripción de la aplicación
+                    user:
+                      type: string
+                      description: ID del usuario asociado a la aplicación
+                    _id:
+                      type: string
+                      description: ID único de la aplicación en la base de datos
+                    __v:
+                      type: integer
+                      description: Versión del documento en la base de datos
+    post:
+      operationId: crearApp
+      summary: Crea una nueva aplicación
+      description: Endpoint para crear una nueva aplicación con un nombre y una descripción.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre de la aplicación
+                description:
+                  type: string
+                  description: Descripción de la aplicación
+              required:
+                - name
+                - description
+      responses:
+        "201":
+          description: Aplicación creada con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Aplicación creada
+                    description: Mensaje de éxito de creación
+                  savedApplication:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: Nombre de la aplicación creada
+                      description:
+                        type: string
+                        description: Descripción de la aplicación creada
+                      user:
+                        type: string
+                        description: ID del usuario asociado a la aplicación
+                      _id:
+                        type: string
+                        description: ID único de la aplicación en la base de datos
+                      __v:
+                        type: integer
+                        description: Versión del documento en la base de datos
+        "400":
+          description: Solicitud incorrecta (por ejemplo, si falta algún campo)
+  /app/{id}:
+    get:
+      operationId: obtenerAppPorId
+      summary: Obtiene una aplicación por ID
+      description: Recupera los detalles de una aplicación específica usando su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detalles de la aplicación obtenidos con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Nombre de la aplicación
+                  description:
+                    type: string
+                    description: Descripción de la aplicación
+                  user:
+                    type: string
+                    description: ID del usuario asociado a la aplicación
+                  _id:
+                    type: string
+                    description: ID único de la aplicación en la base de datos
+                  __v:
+                    type: integer
+                    description: Versión del documento en la base de datos
+        "404":
+          description: Aplicación no encontrada
+    delete:
+      operationId: eliminarApp
+      summary: Elimina una aplicación por ID
+      description: Elimina una aplicación específica usando su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Aplicación eliminada con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Aplicación eliminada
+                    description: Mensaje confirmando la eliminación
+        "404":
+          description: Aplicación no encontrada
+    put:
+      operationId: actualizarApp
+      summary: Actualiza una aplicación
+      description: Modifica todos los detalles de una aplicación específica.
+      parameters:
+        - name: appId
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+              required:
+                - name
+                - description
+      responses:
+        "200":
+          description: Aplicación actualizada con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Aplicación actualizada
+                  application:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      description:
+                        type: string
+                      user:
+                        type: string
+                      _id:
+                        type: string
+          "404":
+            description: Aplicación no encontrada
+  /app/{id}/modules:
+    get:
+      operationId: listarModulos
+      summary: Lista todos los módulos de una aplicación
+      description: Recupera todos los módulos de una aplicación específica usando su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de módulos obtenida con éxito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Nombre del módulo
+                    description:
+                      type: string
+                      description: Descripción del módulo
+                    status:
+                      type: boolean
+                      description: Estado del módulo
+                    _id:
+                      type: string
+                      description: ID único del módulo en la base de datos
+    post:
+      operationId: crearModulo
+      summary: Crea un nuevo módulo en la aplicación
+      description: Endpoint para crear un nuevo módulo en una aplicación específica.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre del módulo
+                description:
+                  type: string
+                  description: Descripción del módulo
+                status:
+                  type: boolean
+                  description: Estado del módulo
+              required:
+                - name
+                - description
+                - status
+      responses:
+        "201":
+          description: Módulo creado con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Módulo creado
+                    description: Mensaje de éxito de creación
+                  savedModule:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: Nombre del módulo
+                      description:
+                        type: string
+                        description: Descripción del módulo
+                      status:
+                        type: boolean
+                        description: Estado del módulo
+                      _id:
+                        type: string
+                        description: ID único del módulo
+        "400":
+          description: Solicitud incorrecta
+    delete:
+      operationId: eliminarTodosLosModulos
+      summary: Elimina todos los módulos de una aplicación
+      description: Elimina todos los módulos asociados a una aplicación específica usando su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Todos los módulos eliminados con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Todos los módulos eliminados
+                    description: Mensaje confirmando la eliminación de todos los módulos
+        "404":
+          description: Aplicación no encontrada
+  /app/{id}/modules/{moduleId}:
+    delete:
+      operationId: eliminarModulo
+      summary: Elimina un módulo por ID en una aplicación
+      description: Elimina un módulo específico dentro de una aplicación usando su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+        - name: moduleId
+          in: path
+          required: true
+          description: ID único del módulo
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Módulo eliminado con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Módulo eliminado
+                    description: Mensaje confirmando la eliminación
+        "404":
+          description: Módulo no encontrado
+    patch:
+      operationId: actualizarEstadoModulo
+      summary: Actualiza el estado de un módulo
+      description: Modifica el estado (activo/inactivo) de un módulo específico.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+        - name: moduleId
+          in: path
+          required: true
+          description: ID único del módulo
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: boolean
+                  description: Estado del módulo
+      responses:
+        "200":
+          description: Estado del módulo actualizado con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Estado actualizado
+                    description: Confirmación de actualización de estado
+        "404":
+          description: Módulo no encontrado
+    put:
+      operationId: actualizarModulo
+      summary: Actualiza un módulo completo
+      description: Modifica todos los detalles de un módulo específico.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+        - name: moduleId
+          in: path
+          required: true
+          description: ID único del módulo
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre del módulo
+                description:
+                  type: string
+                  description: Descripción del módulo
+                status:
+                  type: boolean
+                  description: Estado del módulo
+              required:
+                - name
+                - description
+                - status
+      responses:
+        "200":
+          description: Módulo actualizado con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Módulo actualizado
+                    description: Confirmación de actualización del módulo
+        "404":
+          description: Módulo no encontrado
+  /app/{id}/modules/{moduleId}/usecases:
+    post:
+      operationId: crearUseCase
+      summary: Crea un nuevo caso de uso en un módulo
+      description: Endpoint para crear un nuevo caso de uso dentro de un módulo específico.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+        - name: moduleId
+          in: path
+          required: true
+          description: ID único del módulo
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título del caso de uso
+                testCases:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      caseId:
+                        type: string
+                        description: Identificación del caso de prueba
+                      description:
+                        type: string
+                        description: Descripción del caso de prueba
+                      preconditions:
+                        type: string
+                        description: Precondiciones del caso de prueba
+                      actions:
+                        type: string
+                        description: Acciones a realizar
+                      expectedResult:
+                        type: string
+                        description: Resultado esperado
+              required:
+                - title
+                - testCases
+      responses:
+        "201":
+          description: Caso de uso creado con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Caso de uso creado
+                  useCase:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        description: Título del caso de uso
+                      testCases:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            caseId:
+                              type: string
+                            description:
+                              type: string
+                            preconditions:
+                              type: string
+                            actions:
+                              type: string
+                            expectedResult:
+                              type: string
+        "400":
+          description: Solicitud incorrecta
+    get:
+      operationId: listarUseCases
+      summary: Lista todos los casos de uso de un módulo
+      description: Recupera todos los casos de uso de un módulo específico usando su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+        - name: moduleId
+          in: path
+          required: true
+          description: ID único del módulo
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de casos de uso obtenida con éxito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    testCases:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          caseId:
+                            type: string
+                          description:
+                            type: string
+                          preconditions:
+                            type: string
+                          actions:
+                            type: string
+                          expectedResult:
+                            type: string
+  /app/{id}/modules/{moduleId}/usecases/{useCaseId}:
+    get:
+      operationId: obtenerUseCase
+      summary: Obtiene un caso de uso específico
+      description: Recupera los detalles de un caso de uso específico usando su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+        - name: moduleId
+          in: path
+          required: true
+          description: ID único del módulo
+          schema:
+            type: string
+        - name: useCaseId
+          in: path
+          required: true
+          description: ID único del caso de uso
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detalles del caso de uso obtenidos con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: Título del caso de uso
+                  testCases:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        caseId:
+                          type: string
+                        description:
+                          type: string
+                        preconditions:
+                          type: string
+                        actions:
+                          type: string
+                        expectedResult:
+                          type: string
+        "404":
+          description: Caso de uso no encontrado
+    put:
+      operationId: actualizarUseCase
+      summary: Actualiza un caso de uso
+      description: Modifica todos los detalles de un caso de uso específico.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+        - name: moduleId
+          in: path
+          required: true
+          description: ID único del módulo
+          schema:
+            type: string
+        - name: useCaseId
+          in: path
+          required: true
+          description: ID único del caso de uso
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título del caso de uso
+                testCases:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      caseId:
+                        type: string
+                      description:
+                        type: string
+                      preconditions:
+                        type: string
+                      actions:
+                        type: string
+                      expectedResult:
+                        type: string
+      responses:
+        "200":
+          description: Caso de uso actualizado con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Caso de uso actualizado
+        "404":
+          description: Caso de uso no encontrado
+    delete:
+      operationId: eliminarUseCase
+      summary: Elimina un caso de uso
+      description: Elimina un caso de uso específico.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único de la aplicación
+          schema:
+            type: string
+        - name: moduleId
+          in: path
+          required: true
+          description: ID único del módulo
+          schema:
+            type: string
+        - name: useCaseId
+          in: path
+          required: true
+          description: ID único del caso de uso
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Caso de uso eliminado con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Caso de uso eliminado
+        "404":
+          description: Caso de uso no encontrado
